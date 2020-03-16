@@ -1,0 +1,39 @@
+<!DOCTYPE >
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div id="mydiv"></div>
+
+    <button id="my-button" class="btn btn-primary">Concluir Pedido</button>
+    <script src="assets/polyfill.min.js"></script>
+    <script src="assets/Ws.browser.js"></script>
+    <script>
+      const ws = adonis.Ws("ws://127.0.0.1:3333").connect();
+      const chat = ws.subscribe("chat");
+
+      const pedido = [
+        {
+          cliente: "Taffarel",
+          pedido: [
+            { id: 1000, name: "arroz", amount: 5 },
+            { id: 1001, name: "manga", amount: 10 },
+            { id: 1002, name: "milho", amount: 2 }
+          ]
+        }
+      ];
+
+      document.getElementById("my-button").onclick = () => {
+        ws.getSubscription("chat").emit("message", {
+          body: pedido
+        });
+      };
+    </script>
+  </body>
+</html>
