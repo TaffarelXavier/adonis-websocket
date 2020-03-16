@@ -7,14 +7,21 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   </head>
   <body>
-      <h1>Novos Pedidos</h1>
-  
-    <div id="accordion">
+      <h1 class="display-4" style="text-align: center;">NOVOS PEDIDOS</h1>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div id="accordion">
+        </div>  
       </div>
+    </div>
+  </div>
 
     <script src="assets/polyfill.min.js"></script>
     <script src="assets/Ws.browser.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script>
 
       const ws = adonis.Ws("ws://127.0.0.1:3333").connect();
@@ -25,19 +32,19 @@
       });
 
       chat.on("message", message => {
-          console.log(message);
           let rows = '';
-          message.body.map(el=>{
+          message.body.map(({pedido_id, cliente, produtos})=>{
             rows += `<div class="card">
-          <div class="card-header" id="headingOne">
+          <div class="card-header" id="${pedido_id}">
             <h5 class="mb-0">
-              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                [1000] - NOVO PEDIDO DE: <strong>${el.cliente}</strong>
+              <button class="btn btn-link" data-toggle="collapse" data-target="#cart_${pedido_id}"
+               aria-expanded="true" aria-controls="collapseOne">
+                [${pedido_id}] - NOVO PEDIDO DE: <strong>${cliente}</strong>
               </button>
             </h5>
           </div>
     
-          <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+          <div id="cart_${pedido_id}" class="collapse show" aria-labelledby="${pedido_id}" data-parent="#accordion">
             <div class="card-body">
                 <table class="table table-hover">
         <thead>
@@ -52,23 +59,32 @@
         </tbody>
     </table>
     <h4><strong>PRODUTOS</strong></h4>
-                <table class="table table-hover">
-        <thead>
+       <table class="table table-hover table-striped ">
+        <thead class="thead-light">
             <tr>
                 <th>ID</th>
                 <th>NAME</th>
-                <th style="text-align:right;">AMOUNT</th>
+                <th style="text-align:center;">AMOUNT</th>
+                <th style="text-align:center;">PRICE</th>
+                <th style="text-align:right;">TOTAL VALUE</th>
             </tr>
         </thead>
         <tbody id="data">`;
-            el.pedido.map(produto=>{
+            let valueTotal = 0;
+            produtos.map(({id, name, amount, price})=>{
+              valueTotal += (amount * price);
                 rows += `<tr>
-                    <td>${produto.id}</td>
-                    <td>${produto.name}</td>
-                    <td style="text-align:right;">${produto.amount}</td>
+                    <td>${id}</td>
+                    <td>${name}</td>
+                    <td style="text-align:center;">${amount}</td>
+                    <td style="text-align:center;">R$ ${price.toFixed(2)}</td>
+                    <td style="text-align:right;">R$ ${(amount * price).toFixed(2)}</td>
                     </tr>`;     
             })
-        rows += `</tbody></table>
+        rows += `</tbody><tfooter><tr>
+                    <td colspan=5 style="text-align:right;">R$ ${valueTotal.toFixed(2)}</td>
+                    </tr></tfooter>
+        </table>
         <h4><strong>ENDEREÇO DE ENTREGA</strong></h4>
     <p>Rua Dom Vital, número 45 - Centro</p>
     <h4><strong>OBSERVAÇÕES</strong></h4>
